@@ -1,26 +1,26 @@
-float CSuperVoxel2D::getMinimumnLengthFromPointToEntityXY(const CurbLINE &entity, const Eigen::Vector3f point) {
-    pointCloudXYPtr cloud(new pointCloudXY);
-    pcl::copyPointCloud(*cloud_ptr_, entity.pts_id, *cloud);
-    pcl::KdTreeFLANN<pcl::PointXY>::Ptr tree(new pcl::KdTreeFLANN<pcl::PointXY>);
-    tree->setInputCloud(cloud);
+inline
+    void applyMeadianFilterOnZ(std::vector<Eigen::Vector3f>& points, const int window_size_half){
+        int start_id = 0;
+        int end_id = 0;
+        for(int i = 0; i < points.size(); ++i){
+            start_id = (i - window_size_half) < 0 ? 0 : (i - window_size_half);
+            end_id = (i + window_size_half) > (points.size() - 1) ? (points.size() - 1) : (i + window_size_half);
 
-    pcl::PointXY searchP;
-    searchP.x = point[0], searchP.y = point[1];
 
+            // range : [start_id, end_id]
+            int vec_size = end_id - start_id + 1;
 
-    std::vector<int> ids(1);
-    std::vector<float> diss(1);
-    float re_d = 0.0f;
-    if(tree->nearestKSearch(searchP, 1, ids, diss)){
-        re_d = std::sqrt(diss[0]);
+            if(vec_size > 0){
+                std::vector<float> z_vec(vec_size);
+                for(int j = 0; j < vec_size; ++j){
+                    z_vec[j] = points[start_id + j][2];
+                }
+
+                points[i][2] = getMedianValue(z_vec);
+
+                std::vector<float>().swap(z_vec);
+                z_vec.shrink_to_fit();
+            }
+
+        }
     }
-
-    std::vector<int>().swap(ids);
-    std::vector<float>().swap(diss);
-    ids.shrink_to_fit();
-    diss.shrink_to_fit();
-    tree.reset();
-    cloud.reset();
-
-    return re_d;
-}
