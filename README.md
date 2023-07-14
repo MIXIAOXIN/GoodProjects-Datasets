@@ -12,4 +12,4 @@
 # Building
 | Project  | Link | w-code | w-dataset |
 | ------------- | ------------- | ------------- | ------------- |
-| Building3D  | [Content Cell](http://building3d.ca/index.php)  | yes  | yes  |
+| Building3D  | [Building3D](http://building3d.ca/index.php)  | yes  | yes  |
